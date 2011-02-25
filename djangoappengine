@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+import argparse
+import logging
+import urllib
+
+FILES = [
+    "http://bitbucket.org/wkornewald/django-testapp/get/tip.zip",
+    "http://bitbucket.org/wkornewald/django-dbindexer/get/tip.zip",
+    "http://bitbucket.org/wkornewald/djangotoolbox/get/tip.zip",
+    "http://bitbucket.org/wkornewald/djangoappengine/get/tip.zip",
+    "http://bitbucket.org/wkornewald/django-nonrel/get/tip.zip",
+]
+
+def main():
+    parser = argparse.ArgumentParser(description="Create a new Django"
+                                     "App Engine project")
+    parser.add_argument("project_path", type=str,
+                        help="The path of the new project")
+    parser.add_argument("-d", "--debug", action="store_true", default=False,
+                        help="Turn on debugging output")
+    args = parser.parse_args()
+
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+
+    logging.debug("Create the project directory")
+    os.mkdir(args.project_path)
+
+    logging.debug("Download the necessary files from AllButtonsPressed")
+    os.chdir(args.project_path)
+    for f in FILES:
+        urllib.urlretrieve(f)
+    
+if __name__ == "__main__":
+    main()
