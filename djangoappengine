@@ -1,14 +1,31 @@
 #!/usr/bin/env python
 import argparse
 import logging
+import os
+import shutil
 import urllib
 
 FILES = [
-    "http://bitbucket.org/wkornewald/django-testapp/get/tip.zip",
-    "http://bitbucket.org/wkornewald/django-dbindexer/get/tip.zip",
-    "http://bitbucket.org/wkornewald/djangotoolbox/get/tip.zip",
-    "http://bitbucket.org/wkornewald/djangoappengine/get/tip.zip",
-    "http://bitbucket.org/wkornewald/django-nonrel/get/tip.zip",
+    {
+        "url":"http://bitbucket.org/wkornewald/django-testapp/get/tip.zip",
+        "fn": "django-testapp",
+        },
+    {
+        "url":"http://bitbucket.org/wkornewald/django-dbindexer/get/tip.zip",
+        "fn": "djangodbindexer",
+        },
+    {
+        "url":"http://bitbucket.org/wkornewald/djangotoolbox/get/tip.zip",
+        "fn": "djangotoolbox",
+        },
+    {
+        "url":"http://bitbucket.org/wkornewald/djangoappengine/get/tip.zip",
+        "fn": "djangoappengine",
+        },
+    {
+        "url":"http://bitbucket.org/wkornewald/django-nonrel/get/tip.zip",
+        "fn": "django-nonrel",
+        },
 ]
 
 def main():
@@ -27,9 +44,34 @@ def main():
     os.mkdir(args.project_path)
 
     logging.debug("Download the necessary files from AllButtonsPressed")
-    os.chdir(args.project_path)
     for f in FILES:
-        urllib.urlretrieve(f)
-    
+        (filename, headers) = urllib.urlretrieve(f["url"])
+        os.system("unzip -qq {} -d {}".format(filename, args.project_path))
+
+    logging.debug("Move stuff")
+    for f in os.listdir(args.project_path):
+        p = os.path.join(args.project_path, f)
+        if os.path.isdir(p):
+            if "dbindexer" in f:
+                shutil.copytree(os.path.join(p, "dbindexer"), 
+                                os.path.join(args.project_path, "dbindexer"))
+            elif "djangoappengine" in f:
+                os.rename(p, os.path.join(args.project_path, "djangoappengine"))
+            elif "djangotoolbox" in f:
+                shutil.copytree(os.path.join(p, "djangotoolbox"), 
+                                os.path.join(args.project_path, "djangotoolbox"))
+            elif "django-nonrel" in f:
+                shutil.copytree(os.path.join(p, "django"), 
+                                os.path.join(args.project_path, "django"))
+            elif "testapp" in f:
+                os.system("cp -r {}/* {}".format(p, args.project_path)) 
+
+    for f in os.listdir(args.project_path):
+        p = os.path.join(args.project_path, f)
+        if "wkornewald" in p:
+            shutil.rmtree(p)
+        
+            
+
 if __name__ == "__main__":
     main()
