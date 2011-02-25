@@ -1,0 +1,2 @@
+#!/bin/sh
+bash -c "awk '{sub(/#127/, "127")};{print}' /etc/hosts > /etc/hosts.new; mv /etc/hosts.new /etc/hosts;"
